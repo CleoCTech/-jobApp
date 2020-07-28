@@ -1,0 +1,160 @@
+<?php
+
+
+require_once 'config.php';
+
+class db
+{
+    private $config = array(
+        "dbdriver" => "mysql",
+        "dbhost" => "127.0.0.1",
+        "dbuser" => "root",
+        "dbpass" => "",
+        "dbname" => "jobapp"
+    );
+
+    public function __construct()
+    {
+        $dbhost = $this->config['dbhost'];
+       // $dbhost = $this->DBNAME;
+        $dbuser = $this->config['dbuser'];
+        $dbpass = $this->config['dbpass'];
+        $dbname = $this->config['dbname'];
+
+        # $sqlitedb = $this->config['sqlitedb'];
+
+        $options = array(
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES   => false,
+        );
+
+        try {
+            switch ($this->config["dbdriver"]) {
+                case "sqlite":
+                   // $conn = "sqlite:{$sqlitedb}";
+                    break;
+                case "mysql":
+                    $conn = "mysql:host={$dbhost};dbname={$dbname}";
+                    break;
+                default:
+                    echo "Unsuportted DB Driver! Check the configuration.";
+                    exit(1);
+            }
+
+            $this->db = new PDO($conn, $dbuser, $dbpass, $options);
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+            exit(1);
+        }
+    }
+
+    public function run($sql, $bind=array())
+    {
+        $sql = trim($sql);
+        
+        try {
+            $result = $this->db->prepare($sql);
+            $result->execute($bind);
+            return $result;
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+            exit(1);
+        }
+    }
+public function create($table, $data)
+    {
+        $fields = $this->filter($table, $data);
+        $sql = "INSERT INTO " . $table . " (" . implode($fields, ", ") . ") VALUES (:" . implode($fields, ", :") . ");";
+        
+        $bind = array();
+        foreach ($fields as $field) {
+            $bind[":$field"] = $data[$field];
+        }
+        $result = $this->run($sql, $bind);
+        return $this->db->lastInsertId();
+    }
+
+    public function get($table, $where="", $bind=array(), $fields="*")
+    {
+        $sql = "SELECT " . $fields . " FROM " . $table;
+        if (!empty($where)) {
+            $sql .= " WHERE " . $where;
+        }
+        $sql .= ";";
+
+        $result = $this->run($sql, $bind);
+
+        $rows = array();
+        while ($row = $result->fetch()) {
+            $rows[] = $row;
+        }
+
+        return $rows;
+    }
+
+    public function getFirst($table, $where="", $bind=array(), $fields="*")
+    {
+        $sql = "SELECT " . $fields . " FROM " . $table;
+        if (!empty($where)) {
+            $sql .= " WHERE " . $where;
+        }
+        $sql .= ";";
+
+        $result = $this->run($sql, $bind);
+        return $result->fetch();
+    }
+
+    public function update($table, $data, $where, $bind=array())
+    {
+        $fields = $this->filter($table, $data);
+        $fieldSize = sizeof($fields);
+
+        $sql = "UPDATE " . $table . " SET ";
+        for ($f = 0; $f < $fieldSize; ++$f) {
+            if ($f > 0) {
+                $sql .= ", ";
+            }
+            $sql .= $fields[$f] . " = :update_" . $fields[$f];
+        }
+        $sql .= " WHERE " . $where . ";";
+        foreach ($fields as $field) {
+            $bind[":update_$field"] = $data[$field];
+        }
+        
+        $result = $this->run($sql, $bind);
+        return $result->rowCount();
+    }
+
+    public function delete($table, $where, $bind="")
+    {
+        $sql = "DELETE FROM " . $table . " WHERE " . $where . ";";
+        $result = $this->run($sql, $bind);
+        return $result->rowCount();
+    }
+
+    private function filter($table, $data)
+    {
+        $driver = $this->config['dbdriver'];
+
+        if ($driver == 'sqlite') {
+            $sql = "PRAGMA table_info('" . $table . "');";
+            $key = "name";
+        } elseif ($driver == 'mysql') {
+            $sql = "DESCRIBE " . $table . ";";
+            $key = "Field";
+        } else {
+            $sql = "SELECT column_name FROM information_schema.columns WHERE table_name = '" . $table . "';";
+            $key = "column_name";
+        }
+        if (false !== ($list = $this->run($sql))) {
+            $fields = array();
+            foreach ($list as $record) {
+                $fields[] = $record[$key];
+            }
+            return array_values(array_intersect($fields, array_keys($data)));
+        }
+
+        return array();
+    }
+}

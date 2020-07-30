@@ -14,7 +14,7 @@ class API extends DB
 
     public function getApplications(){
         try {
-            $applications = $this->con->prepare("SELECT A.`application_id`, P.`fullname`, P.`ID_No`, P.`phone`, A.`created_at`
+            $applications = $this->con->prepare("SELECT A.`application_id`, P.`fullname`, P.`ID_No`, P.`phone`, A.`created_at`, A.`book_file`
             FROM applications AS A INNER JOIN `personal_info` AS P ON 
             A.`application_id`=P.`application_id`;");
 

@@ -87,7 +87,7 @@ $applications =$obj->getApplications();
                                     // echo " <a class='btn btn-primary text-white'>Download CV</a>";
                                     // echo " <a class='btn btn-danger text-white'>Delete</a>";
                                     echo "<button type='submit' name='process' class='forward' id='view'>View</button>
-                                        <button type='submit' name='process' class='forward' id='st'>Download
+                                        <button type='button' name='process' class='forward CV' id='st' data-id='" . $application['book_file'] ."'>Download
                                             CV</button>
                                         <button type='submit' name='process' class='btn btn-danger text-white'
                                             id='st'>Delete</button>";
@@ -121,27 +121,12 @@ $(document).ready(function() {
         //  var details = '';
         var app_id = $(this).find('td:first-child').html();
         document.getElementById("holder").value = app_id;
-        // $('#holder').val = app_id;
-        //  alert(app_id);
-        // details += 'Application ID : ' + $(this).find('td:first-child').html() + '\n';
-        // details += 'Applicant Name : ' + $(this).find('td:nth-child(2)').html() + '\n';
-        // details += 'Description : ' + $(this).find('td:nth-child(3)').html() + '\n';
-        // alert(details);
     });
-    // $('#view').click(function() {
-    //     var details = '';
-    //     var str = $("#app_id").val();
-    //     // details += 'Application ID : ' + $(this).find('td:first-child').html() + '\n';
-    //     // details += 'Applicant Name : ' + $(this).find('td:nth-child(2)').html() + '\n';
-    //     // details += 'Description : ' + $(this).find('td:nth-child(3)').html() + '\n';
-    //     alert(str);
-    // });
+    $(".CV").on("click", function() {
+        $targetID = $(this).attr('data-id');
+        //console.log("Selected ID:" + $targetID);
+        window.location.href = "../resume_files/" + $targetID;
+        // REMOVE WILL COME HERE
+    });
 });
 </script>
-<!-- <script>
-$(document).ready(function() {
-    //console.log("yes");
-    var rowCount = $('#myTable tr').length;
-    console.log(rowCount);
-});
-</script> -->

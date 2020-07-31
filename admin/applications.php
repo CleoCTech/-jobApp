@@ -11,10 +11,6 @@ $applications =$obj->getApplications();
 //var_dump($applications);
 ?>
 <style>
-.table {
-    /* margin-top: -35rem !important; */
-}
-
 .modal-title {
     padding: 1rem 1rem;
     margin: -1rem auto -4rem 0rem;
@@ -78,7 +74,7 @@ $applications =$obj->getApplications();
                                         <th scope="col">ID No</th>
                                         <th scope="col">Phone No</th>
                                         <th scope="col">Date</th>
-                                        <th scope="col">Options</th>
+                                        <th scope="col">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>

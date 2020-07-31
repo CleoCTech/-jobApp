@@ -15,6 +15,12 @@ $applications =$obj->getApplications();
     /* margin-top: -35rem !important; */
 }
 
+.modal-title {
+    padding: 1rem 1rem;
+    margin: -1rem auto -4rem 0rem;
+    color: #0781B6;
+}
+
 .content-right {
     padding: 10px !important;
     display: block !important;
@@ -22,6 +28,33 @@ $applications =$obj->getApplications();
 </style>
 
 <body>
+
+    <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <h4 class="modal-title" id="myModalLabel">Confirm Delete</h4>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+                </div>
+                <form action="delete.php" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" name="delete_id" id="delete_id" value="">
+                        <input type="hidden" name="file_pointer" id="file_pointer" value="">
+                        <p>You are about to delete one application, this procedure is irreversible.</p>
+                        <p>Do you want to proceed?</p>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="submit" name="deletedata" class="btn btn-danger text-white">Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div id="app">
         <?php 
             include(dirname(__DIR__).'/inc/navbar.php');
@@ -82,19 +115,16 @@ $applications =$obj->getApplications();
 
                                     echo "</td>" ;
                                 echo "<td>" ;
-
                                     // echo " <a class='btn btn-info text-white'>View</a>";
                                     // echo " <a class='btn btn-primary text-white'>Download CV</a>";
                                     // echo " <a class='btn btn-danger text-white'>Delete</a>";
                                     echo "<button type='submit' name='process' class='forward' id='view'>View</button>
                                         <button type='button' name='process' class='forward CV' id='st' data-id='" . $application['book_file'] ."'>Download
                                             CV</button>
-                                        <button type='submit' name='process' class='btn btn-danger text-white'
-                                            id='st'>Delete</button>";
+                                        <button type='button' name='process' class='btn btn-danger text-white DEL'
+                                            id='st' data-toggle='modal' data-target='#confirm-delete' data-id='" . $application['application_id'] ."' >Delete</button>";
                                     echo "</td>" ;
                                 echo "</tr>" ;
-
-
                                 }
                                 ?>
                                 </tbody>
@@ -127,6 +157,14 @@ $(document).ready(function() {
         //console.log("Selected ID:" + $targetID);
         window.location.href = "../resume_files/" + $targetID;
         // REMOVE WILL COME HERE
+    });
+    $(".DEL").on("click", function() {
+        $targetID = $(this).attr('data-id');
+
+        //  $file_pointer = $(".CV").attr('data-id');
+        document.getElementById("delete_id").value = $targetID;
+        //  document.getElementById("file_pointer").value = $file_pointer;
+        //console.log("Selected ID:" + $file_pointer);
     });
 });
 </script>

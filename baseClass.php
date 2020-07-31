@@ -114,7 +114,7 @@ class API extends DB
                         );
                     $save_personal_info->execute(
                         [
-                           ":fullname" => $_POST['name'], 
+                        ":fullname" => $_POST['name'], 
                            ":email" => $_POST['email'],
                            ":phone" => $_POST['phone'], 
                            ":ID_No" =>$_POST['ID_No'], 
@@ -135,7 +135,7 @@ class API extends DB
                     }
 
                 } catch (PDOException $e) {
-                    var_dump($e->getMessage());
+                   // var_dump($e->getMessage());
                     return ['code' => 0, 'message' => $e->getMessage()];
                 } 
               
